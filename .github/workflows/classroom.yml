@@ -1,0 +1,30 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: regression_test.py
+      id: regression_test-py
+      uses: classroom-resources/autograding-command-grader@v1
+      with:
+        test-name: regression_test.py
+        setup-command: pip install -r requirements.txt
+        command: pytest regression_test.py
+        timeout: 10
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        REGRESSION_TEST-PY_RESULTS: "${{steps.regression_test-py.outputs.result}}"
+      with:
+        runners: regression_test-py

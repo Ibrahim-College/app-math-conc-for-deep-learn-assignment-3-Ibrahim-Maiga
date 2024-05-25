@@ -32,11 +32,11 @@ def fit_regression_model(X, y):
     """
     learning_rate = 0.01 # Pick a better learning rate
     num_epochs = 100 # Pick a better number of epochs
-    input_features = 0 # extract the number of features from the input `shape` of X
-    output_features = 0 # extract the number of features from the output `shape` of y
+    input_features = X.shape[1] # extract the number of features from the input `shape` of X
+    output_features = 1 # extract the number of features from the output `shape` of y
     model = create_linear_regression_model(input_features, output_features)
     
-    loss_fn = nn.L1Loss() # Use mean squared error loss, like in class
+    loss_fn = nn.MSELoss() # Use mean squared error loss, like in class
 
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -44,8 +44,10 @@ def fit_regression_model(X, y):
 
     for epoch in range(1, num_epochs):
         loss = train_iteration(X, y, model, loss_fn, optimizer)
-        if False: # Change this condition to stop the training when the loss is not changing much.
+        if abs(previous_loss - loss.item()) < 1e-6: # Change this condition to stop the training when the loss is not changing much.
             break
+        if epoch % 1000 == 0:
+            print(f'Epoch {epoch}, Loss: {loss.item()}')
         previos_loss = loss.item()
         # This is a good place to print the loss every 1000 epochs.
     return model, loss
